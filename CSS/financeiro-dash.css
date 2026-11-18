@@ -1,0 +1,209 @@
+/* =========================================================
+   DataOps | Financeiro (complemento do dashboard.css)
+   ========================================================= */
+
+#finance .fin-controls{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+#finance .fin-panel,
+#finance .fin-grid,
+#finance .fin-metrics{
+    margin-top:20px;
+}
+
+#finance .fin-muted{opacity:.65;font-size:13px}
+
+/* ----- gráficos ----- */
+#finance .fin-chart{
+    position:relative;
+    width:100%;
+    height:300px;
+}
+#finance .fin-chart.tall{height:340px}
+
+/* ----- variação nos cards ----- */
+#finance .fin-delta{
+    display:inline-block;
+    padding:2px 8px;
+    margin-right:6px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+}
+#finance .fin-delta.up{background:rgba(34,197,94,.14);color:#22c55e}
+#finance .fin-delta.down{background:rgba(239,68,68,.14);color:#ef4444}
+
+/* ----- indicadores secundários ----- */
+#finance .fin-metrics{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+}
+#finance .fin-metric{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:16px 18px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    background:rgba(255,255,255,.03);
+}
+#finance .fin-metric .fin-ico{
+    width:42px;height:42px;flex-shrink:0;
+    display:grid;place-items:center;
+    border-radius:12px;font-size:21px;
+}
+#finance .fin-metric span.label{display:block;font-size:12.5px;opacity:.65}
+#finance .fin-metric strong{display:block;font-size:20px;margin-top:3px}
+
+/* cores dos ícones */
+#finance .c-blue{background:rgba(59,130,246,.15);color:#60a5fa}
+#finance .c-green{background:rgba(34,197,94,.15);color:#22c55e}
+#finance .c-orange{background:rgba(245,158,11,.15);color:#f59e0b}
+#finance .c-purple{background:rgba(139,92,246,.15);color:#a78bfa}
+#finance .c-red{background:rgba(239,68,68,.15);color:#ef4444}
+
+/* ----- orçamento ----- */
+#finance .fin-b-row{margin-bottom:18px}
+#finance .fin-b-top{
+    display:flex;justify-content:space-between;gap:12px;
+    font-size:13.5px;margin-bottom:8px;
+}
+#finance .fin-b-top span{opacity:.65;font-size:12.5px}
+#finance .fin-b-track{
+    height:9px;border-radius:9px;overflow:hidden;
+    background:rgba(255,255,255,.08);
+}
+#finance .fin-b-fill{
+    height:100%;width:0;border-radius:9px;
+    transition:width .9s cubic-bezier(.2,.8,.2,1);
+}
+
+/* ----- abas pequenas ----- */
+#finance .fin-tabs{
+    display:flex;padding:4px;gap:4px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:12px;
+}
+#finance .fin-tabs button{
+    border:none;background:none;color:inherit;opacity:.65;
+    padding:7px 14px;border-radius:9px;cursor:pointer;font:inherit;
+    transition:.2s;
+}
+#finance .fin-tabs button.active{
+    opacity:1;background:rgba(255,255,255,.1);
+}
+
+/* ----- listas ----- */
+#finance .fin-due-total{margin:0 0 12px;font-size:13px;opacity:.75}
+#finance .fin-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+#finance .fin-list li{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 14px;border-radius:14px;
+    background:rgba(255,255,255,.035);
+    border:1px solid transparent;transition:.2s;
+}
+#finance .fin-list li:hover{border-color:rgba(139,92,246,.45)}
+#finance .fin-list .fin-ico{
+    width:38px;height:38px;flex-shrink:0;border-radius:11px;
+    display:grid;place-items:center;font-size:12px;font-weight:700;
+}
+#finance .fin-list .info{flex:1;min-width:0}
+#finance .fin-list .info b{
+    display:block;font-weight:600;font-size:14px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#finance .fin-list .info small{opacity:.6;font-size:12px}
+#finance .fin-list .amt{text-align:right;font-weight:600;font-size:14px}
+#finance .fin-list .amt small{display:block;font-size:11.5px;font-weight:500}
+#finance .t-late{color:#ef4444}
+#finance .t-soon{color:#f59e0b}
+#finance .t-ok{opacity:.6}
+
+/* ----- insights ----- */
+#finance .fin-insights{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:14px;
+}
+#finance .fin-insight{
+    display:flex;gap:14px;align-items:flex-start;
+    padding:16px;border-radius:16px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.03);
+}
+#finance .fin-insight .fin-ico{
+    width:40px;height:40px;flex-shrink:0;border-radius:12px;
+    display:grid;place-items:center;font-size:20px;
+}
+#finance .fin-insight strong{display:block;font-size:14px;margin-bottom:4px}
+#finance .fin-insight p{margin:0;font-size:13px;opacity:.7;line-height:1.45}
+
+/* ----- tabela ----- */
+#finance .data-table th{cursor:pointer;user-select:none;white-space:nowrap}
+#finance .data-table th:hover{color:#a78bfa}
+#finance .data-table th .arr{opacity:.45;margin-left:5px;font-size:11px}
+#finance .data-table td{white-space:nowrap}
+#finance .data-table td.num,
+#finance .data-table th.num{text-align:right}
+#finance .data-table td.name i{
+    display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:10px;
+}
+#finance .data-table tfoot td{font-weight:700;border-top:1px solid rgba(255,255,255,.12)}
+#finance .table-status.danger{
+    background:rgba(239,68,68,.14);color:#ef4444;
+}
+#finance .data-table .empty{text-align:center;opacity:.6;padding:28px}
+
+/* ----- ajustes de acabamento: cards principais ----- */
+#finance .stat-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+#finance .stat-card h3{
+    font-size:30px;
+    font-weight:600;
+    line-height:1.15;
+    letter-spacing:-.02em;
+    margin:10px 0 8px;
+}
+
+/* ----- ajustes de acabamento: filtros do topo ----- */
+#finance .filter-control{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+#finance .filter-control select{
+    color-scheme:dark;
+    background:rgba(255,255,255,.05);
+    color:inherit;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;
+    padding:9px 12px;
+    font:inherit;
+    cursor:pointer;
+    outline:none;
+}
+#finance .filter-control select:hover,
+#finance .filter-control select:focus{
+    border-color:rgba(139,92,246,.6);
+}
+#finance .filter-control select option{
+    background:#111a2e;
+    color:#e5e7eb;
+}
+
+@media (max-width:1250px){
+    #finance .fin-metrics{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:640px){
+    #finance .fin-metrics{grid-template-columns:1fr}
+    #finance .fin-chart,#finance .fin-chart.tall{height:260px}
+}

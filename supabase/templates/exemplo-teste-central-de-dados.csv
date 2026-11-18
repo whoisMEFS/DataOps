@@ -1,0 +1,5 @@
+id,registro,categoria,status
+TESTE-001,Registro de teste 1,Teste,Concluído
+TESTE-002,Registro de teste 2,Teste,Pendente
+TESTE-003,Registro de teste 3,Teste,Em andamento
+TESTE-004,Registro de teste 4,Teste,Erro

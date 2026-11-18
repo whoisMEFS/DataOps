@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DataOps | Dashboard</title>
+
+    <link rel="stylesheet" href="../CSS/dashboard.css">
+<link rel="stylesheet" href="../CSS/financeiro-dash.css">
+<link rel="stylesheet" href="../CSS/comercial.css">
+<link rel="stylesheet" href="../CSS/logistica-dash.css">
+<link rel="stylesheet" href="../CSS/ti-dash.css">
+<link rel="stylesheet" href="../CSS/relatorios-configuracoes.css">
+<link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+
+
+<script>
+(function () {
+    try {
+        var p = JSON.parse(localStorage.getItem("dataops_prefs") || "{}") || {};
+        var t = p.theme || "dark";
+        if (t === "auto") {
+            t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+        if (p.reduceMotion) document.documentElement.classList.add("reduce-motion");
+    } catch (e) { /* sem localStorage: segue com o tema escuro padrão */ }
+})();
+</script>
+
+
+
+
+
+<script>
+    /* Oculta o painel até a sessão ser verificada (JS/services/dashboard-boot.js). */
+    document.documentElement.setAttribute("data-auth", "pending");
+</script>
+<style>
+    html[data-auth="pending"] body { visibility: hidden; }
+    html[data-auth="error"] body { visibility: visible; }
+</style>
+<script src="../JS/services/ready.js"></script>
+<script type="module" src="../JS/services/dashboard-boot.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="../JS/graficos-efeitos.js"></script>
+    <script src="../JS/dashboard.js" defer></script>
+    <script src="../JS/financeiro-dash.js" defer></script>
+    <script src="../JS/comercial.js" defer></script>
+    <script src="../JS/logistica-dash.js" defer></script>
+    <script src="../JS/ti-dash.js" defer></script>
+    <script src="../JS/relatorios-configuracoes.js" defer></script>
+    <script src="../JS/intro.js" defer></script>
+    <script src="../JS/logout.js" defer></script>
+</head>
+
+<body>
+    
+
+
+    <div class="dashboard">
+
+        <!-- MENU LATERAL -->
+        <aside class="sidebar">
+
+  <div class="brand">
+                <div class="brand-logo" id="headerLogo">D</div>
+                <span class="brand-name" id="headerName">ataOps</span>
+            </div>
+
+            <nav class="menu">
+
+    <p class="menu-title">MENU PRINCIPAL</p>
+
+    <a href="#overview" class="menu-item active" data-page="overview">
+        <i class="bx bx-grid-alt"></i>
+        <span>Visão geral</span>
+    </a>
+
+    <a href="#analytics" class="menu-item" data-page="analytics">
+        <i class="bx bx-line-chart"></i>
+        <span>Análises</span>
+    </a>
+
+    <a href="#data" class="menu-item" data-page="data">
+        <i class="bx bx-data"></i>
+        <span>Central de Dados</span>
+    </a>
+
+    <p class="menu-title shortcuts-title">DEPARTAMENTOS</p>
+
+    <a href="#finance" class="menu-item" data-page="finance">
+        <i class="bx bx-wallet"></i>
+        <span>Financeiro</span>
+    </a>
+
+    <a href="#commercial" class="menu-item" data-page="commercial">
+        <i class="bx bx-trending-up"></i>
+        <span>Comercial</span>
+    </a>
+
+    <a href="#logistics" class="menu-item" data-page="logistics">
+        <i class="bx bx-package"></i>
+        <span>Logística</span>
+    </a>
+
+    <a href="#it" class="menu-item" data-page="it">
+        <i class="bx bx-desktop"></i>
+        <span>TI</span>
+    </a>
+
+    <p class="menu-title shortcuts-title">SISTEMA</p>
+
+    <a href="#reports" class="menu-item" data-page="reports">
+        <i class="bx bx-file"></i>
+        <span>Relatórios</span>
+    </a>
+
+    <a href="#settings" class="menu-item" data-page="settings">
+        <i class="bx bx-cog"></i>
+        <span>Configurações</span>
+    </a>
+
+</nav>
+
+            <div class="sidebar-bottom">
+                <div class="user-avatar">U</div>
+
+                <div class="user-info">
+                    <strong id="userName">Usuário</strong>
+                    <span>DataOps</span>
+                </div>
+
+                <button id="logoutButton" class="logout-button"
+                        type="button" title="Sair da conta">
+                    <i class="bx bx-log-out"></i>
+                </button>
+            </div>
+
+        </aside>
+
+
+       <!-- CONTEÚDO PRINCIPAL -->
+<main class="main-content">
+
+    <!-- CABEÇALHO -->
+    <header class="topbar">
+
+        <div>
+            <p class="welcome-label">PAINEL DE CONTROLE</p>
+
+            <h1 id="pageTitle">Visão geral</h1>
+
+            <p class="page-subtitle" id="pageSubtitle">
+                Acompanhe os indicadores do seu DataOps.
+            </p>
+        </div>
+
+        <div class="topbar-actions">
+
+            <span class="status-badge">
+                <span class="status-dot"></span>
+                Sistema ativo
+            </span>
+
+            <!-- BOTÃO DE NOTIFICAÇÕES -->
+            <div class="notification-wrapper">
+
+                <button
+                    class="icon-button notification-trigger"
+                    id="notificationButton"
+                    type="button"
+                    title="Notificações"
+                    aria-label="Abrir notificações"
+                    aria-expanded="false"
+                    aria-controls="notificationPanel"
+                >
+                    <i class="bx bx-bell"></i>
+
+                    <span
+                        class="notification-count"
+                        id="notificationCount"
+                        hidden
+                    >0</span>
+                </button>
+
+                <!-- PAINEL DE NOTIFICAÇÕES -->
+                <section
+                    class="notification-panel"
+                    id="notificationPanel"
+                    aria-label="Central de notificações"
+                    hidden
+                >
+
+                    <!-- CABEÇALHO DO PAINEL -->
+                    <div class="notification-header">
+
+                        <div>
+                            <span class="notification-eyebrow">
+                                DATAOPS CENTER
+                            </span>
+
+                            <h2>Notificações</h2>
+
+                            <p id="notificationSummary">
+                                Tudo tranquilo por aqui.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="notification-close"
+                            id="notificationClose"
+                            aria-label="Fechar notificações"
+                        >
+                            <i class="bx bx-x"></i>
+                        </button>
+
+                    </div>
+
+                    <!-- AÇÕES -->
+                    <div class="notification-toolbar">
+
+                        <span class="notification-section-label">
+                            ATIVIDADE RECENTE
+                        </span>
+
+                        <button
+                            type="button"
+                            id="markAllNotificationsRead"
+                            class="notification-text-button"
+                        >
+                            Marcar todas como lidas
+                        </button>
+
+                    </div>
+
+                    <!-- LISTA DE NOTIFICAÇÕES -->
+                    <div
+                        class="notification-list"
+                        id="notificationList"
+                        aria-live="polite"
+                    ></div>
+
+                    <!-- RODAPÉ -->
+                    <div class="notification-footer">
+
+                        <span>
+                            <span class="notification-status-dot"></span>
+                            Central ativa
+                        </span>
+
+                        <button
+                            type="button"
+                            id="clearNotifications"
+                            class="notification-text-button"
+                        >
+                            Limpar
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </div>
+            <!-- FIM DAS NOTIFICAÇÕES -->
+
+        </div>
+
+    </header>
+            <!-- PÁGINA: VISÃO GERAL -->
+            <section class="page-section active" id="overview">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>Resumo geral</h2>
+                        <p>Uma visão rápida dos seus indicadores.</p>
+                    </div>
+
+                    <label class="filter-control">
+                        <span>Período:</span>
+
+                        <select id="periodFilter">
+                            <option value="week">Últimos 7 dias</option>
+                            <option value="month">Últimos 30 dias</option>
+                            <option value="year">Últimos 12 meses</option>
+                        </select>
+                    </label>
+                </div>
+
+
+                <!-- CARTÕES DE INDICADORES -->
+                <div class="stats-grid">
+
+                    <article class="stat-card">
+                        <div class="stat-top">
+                            <span>Total de registros</span>
+                            <span class="stat-icon blue">
+                                <i class="bx bx-data"></i>
+                            </span>
+                        </div>
+
+                        <h3 class="counter" data-value="0">—</h3>
+
+                        <p class="stat-description">
+                            Registros na Central de Dados
+                        </p>
+                    </article>
+
+
+                    <article class="stat-card">
+                        <div class="stat-top">
+                            <span>Processos concluídos</span>
+                            <span class="stat-icon green">
+                                <i class="bx bx-check-circle"></i>
+                            </span>
+                        </div>
+
+                        <h3 class="counter" data-value="0">—</h3>
+
+                        <p class="stat-description">
+                            Processos finalizados
+                        </p>
+                    </article>
+
+
+                    <article class="stat-card">
+                        <div class="stat-top">
+                            <span>Pendências</span>
+                            <span class="stat-icon orange">
+                                <i class="bx bx-time-five"></i>
+                            </span>
+                        </div>
+
+                        <h3 class="counter" data-value="0">—</h3>
+
+                        <p class="stat-description">
+                            Itens aguardando análise
+                        </p>
+                    </article>
+
+
+                    <article class="stat-card">
+                        <div class="stat-top">
+                            <span>Taxa de sucesso</span>
+                            <span class="stat-icon purple">
+                                <i class="bx bx-trending-up"></i>
+                            </span>
+                        </div>
+
+                        <h3 class="counter" data-value="0" data-decimals="1">—</h3>
+
+                        <p class="stat-description">
+                            Concluídos sobre o total
+                        </p>
+                    </article>
+
+                </div>
+
+
+                <!-- GRÁFICO PRINCIPAL -->
+                <section class="panel chart-panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2>Evolução dos dados</h2>
+                            <p>Visualize a movimentação dos indicadores.</p>
+                        </div>
+
+                        <span class="chart-badge">
+                            <i class="bx bx-bar-chart-alt-2"></i>
+                            Análise interativa
+                        </span>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+
+                </section>
+
+
+                <!-- PAINÉIS INFERIORES -->
+                <div class="bottom-grid">
+
+                    <section class="panel">
+
+                        <div class="panel-header">
+                            <div>
+                                <h2>Distribuição dos dados</h2>
+                                <p>Composição dos registros.</p>
+                            </div>
+                        </div>
+
+                        <div class="donut-container">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+
+                    </section>
+
+
+                    <section class="panel">
+
+                        <div class="panel-header">
+                            <div>
+                                <h2>Atividades recentes</h2>
+                                <p>Últimos registros importados.</p>
+                            </div>
+                        </div>
+
+                        <div class="activity-list" id="recentActivity" aria-live="polite">
+                            <p class="table-state">Carregando atividades...</p>
+                        </div>
+
+                    </section>
+
+                </div>
+
+            </section>
+
+
+            <!-- PÁGINA: ANÁLISES -->
+            <section class="page-section" id="analytics">
+
+                <div class="panel">
+                    <h2>Análises</h2>
+
+                    <p>
+                        Explore os indicadores e acompanhe a evolução dos dados.
+                    </p>
+
+                    <div class="chart-container">
+                        <canvas id="analyticsChart"></canvas>
+                    </div>
+                </div>
+
+            </section>
+
+<!-- PÁGINA: FINANCEIRO -->
+<section class="page-section" id="finance">
+ 
+    <!-- CABEÇALHO + FILTROS -->
+    <div class="section-heading">
+        <div>
+            <h2>Financeiro</h2>
+            <p>Acompanhe receitas, despesas, fluxo de caixa e resultados.</p>
+        </div>
+ 
+        <div class="fin-controls">
+            <label class="filter-control">
+                <span>Período:</span>
+                <select id="finRange">
+                    <option value="3">Últimos 3 meses</option>
+                    <option value="6" selected>Últimos 6 meses</option>
+                </select>
+            </label>
+ 
+            <label class="filter-control">
+                <span>Cenário:</span>
+                <select id="finScenario">
+                    <option value="base">Base</option>
+                    <option value="opt">Otimista (+8%)</option>
+                    <option value="pess">Pessimista (-10%)</option>
+                </select>
+            </label>
+ 
+            <button class="secondary-button" id="finExport" type="button">
+                <i class="bx bx-download"></i>
+                Exportar CSV
+            </button>
+        </div>
+    </div>
+ 
+    <!-- INDICADORES PRINCIPAIS (gerados pelo JS) -->
+    <div class="stats-grid" id="finKpis"></div>
+ 
+    <!-- INDICADORES SECUNDÁRIOS (gerados pelo JS) -->
+    <div class="fin-metrics" id="finMetrics"></div>
+ 
+    <!-- FLUXO DE CAIXA -->
+    <section class="panel chart-panel fin-panel">
+        <div class="panel-header">
+            <div>
+                <h2>Fluxo de caixa</h2>
+                <p>Entradas, saídas e saldo acumulado mês a mês.</p>
+            </div>
+ 
+            <span class="chart-badge">
+                <i class="bx bx-line-chart"></i>
+                Projeção do período
+            </span>
+        </div>
+ 
+        <div class="fin-chart tall">
+            <canvas id="finCashChart"></canvas>
+        </div>
+    </section>
+ 
+    <!-- RECEITAS / DESPESAS POR CATEGORIA -->
+    <div class="bottom-grid fin-grid">
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Receita por categoria</h2>
+                    <p>De onde vem o dinheiro no período.</p>
+                </div>
+            </div>
+ 
+            <div class="fin-chart">
+                <canvas id="finIncomeChart"></canvas>
+            </div>
+        </section>
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Despesa por categoria</h2>
+                    <p>Para onde o dinheiro está indo mês a mês.</p>
+                </div>
+            </div>
+ 
+            <div class="fin-chart">
+                <canvas id="finExpenseChart"></canvas>
+            </div>
+        </section>
+ 
+    </div>
+ 
+    <!-- ORÇAMENTO / VENCIMENTOS -->
+    <div class="bottom-grid fin-grid">
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Orçamento x realizado</h2>
+                    <p>Quanto do orçamento de cada categoria já foi usado.</p>
+                </div>
+            </div>
+ 
+            <div id="finBudget"></div>
+        </section>
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Vencimentos</h2>
+                    <p>Contas a pagar e a receber nos próximos dias.</p>
+                </div>
+ 
+                <div class="fin-tabs" id="finDueTabs">
+                    <button type="button" class="active" data-tab="pay">A pagar</button>
+                    <button type="button" data-tab="recv">A receber</button>
+                </div>
+            </div>
+ 
+            <p class="fin-due-total" id="finDueTotal"></p>
+            <ul class="fin-list" id="finDueList"></ul>
+        </section>
+ 
+    </div>
+ 
+    <!-- ALERTAS E INSIGHTS -->
+    <section class="panel fin-panel">
+        <div class="panel-header">
+            <div>
+                <h2>Alertas e insights</h2>
+                <p>Pontos de atenção calculados a partir dos dados do período.</p>
+            </div>
+        </div>
+ 
+        <div class="fin-insights" id="finInsights"></div>
+    </section>
+ 
+    <!-- DETALHAMENTO -->
+    <section class="panel fin-panel">
+        <div class="panel-header">
+            <div>
+                <h2>Detalhamento mensal</h2>
+                <p>Receitas e despesas por categoria em cada mês.</p>
+            </div>
+        </div>
+ 
+        <div class="data-filters">
+            <div class="filter-field">
+                <label for="finSearch">Pesquisar</label>
+                <input type="search" id="finSearch" class="search-input"
+                       placeholder="Buscar categoria...">
+            </div>
+ 
+            <div class="filter-field">
+                <label for="finType">Tipo</label>
+                <select id="finType">
+                    <option value="all">Todos</option>
+                    <option value="Receita">Receitas</option>
+                    <option value="Despesa">Despesas</option>
+                </select>
+            </div>
+ 
+            <button type="button" id="finClear" class="secondary-button">
+                Limpar filtros
+            </button>
+        </div>
+ 
+        <p id="finCount" class="fin-muted" aria-live="polite"></p>
+ 
+        <div class="table-wrapper">
+            <table class="data-table" id="finTable">
+                <thead></thead>
+                <tbody></tbody>
+                <tfoot></tfoot>
+            </table>
+        </div>
+    </section>
+ 
+</section>
+ 
+
+<!-- PÁGINA: COMERCIAL -->
+<section class="page-section" id="commercial">
+ 
+    <!-- CABEÇALHO + FILTROS -->
+    <div class="section-heading">
+        <div>
+            <h2>Comercial</h2>
+            <p>Acompanhe vendas, metas, funil e desempenho da equipe.</p>
+        </div>
+ 
+        <div class="com-controls">
+            <label class="filter-control">
+                <span>Período:</span>
+                <select id="comRange">
+                    <option value="3">Últimos 3 meses</option>
+                    <option value="6" selected>Últimos 6 meses</option>
+                </select>
+            </label>
+ 
+            <label class="filter-control">
+                <span>Vendedor:</span>
+                <select id="comSeller"></select>
+            </label>
+ 
+            <label class="filter-control">
+                <span>Canal:</span>
+                <select id="comChannel"></select>
+            </label>
+ 
+            <button class="secondary-button" id="comExport" type="button">
+                <i class="bx bx-download"></i>
+                Exportar CSV
+            </button>
+        </div>
+    </div>
+ 
+    <!-- LINHA PRINCIPAL: indicadores + gráfico à esquerda, funil à direita -->
+    <div class="com-layout">
+ 
+        <div class="com-main">
+ 
+            <!-- INDICADORES PRINCIPAIS (gerados pelo JS) -->
+            <div class="stats-grid" id="comKpis"></div>
+ 
+            <!-- INDICADORES SECUNDÁRIOS (gerados pelo JS) -->
+            <div class="com-metrics" id="comMetrics"></div>
+ 
+            <!-- VENDAS x META -->
+            <section class="panel com-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Vendas x meta</h2>
+                        <p>Receita fechada mês a mês comparada à meta mensal.</p>
+                    </div>
+ 
+                    <span class="chart-badge">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                        Meta mensal
+                    </span>
+                </div>
+ 
+                <div class="com-chart tall">
+                    <canvas id="comSalesChart"></canvas>
+                </div>
+            </section>
+ 
+        </div>
+ 
+        <!-- FUNIL (coluna vermelha/azul à direita) -->
+        <aside class="panel com-funnel-panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Funil comercial</h2>
+                    <p>Da captação do lead até o fechamento.</p>
+                </div>
+            </div>
+ 
+            <div class="com-funnel" id="comFunnel"></div>
+            <p class="com-funnel-foot" id="comFunnelFoot"></p>
+        </aside>
+ 
+    </div>
+ 
+    <!-- CANAIS / VENDEDORES -->
+    <div class="bottom-grid com-grid">
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Vendas por canal</h2>
+                    <p>De onde vem a receita no período.</p>
+                </div>
+            </div>
+ 
+            <div class="com-chart">
+                <canvas id="comChannelChart"></canvas>
+            </div>
+        </section>
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Desempenho por vendedor</h2>
+                    <p>Receita fechada por pessoa da equipe.</p>
+                </div>
+            </div>
+ 
+            <div class="com-chart">
+                <canvas id="comSellerChart"></canvas>
+            </div>
+        </section>
+ 
+    </div>
+ 
+    <!-- META POR VENDEDOR / INSIGHTS -->
+    <div class="bottom-grid com-grid">
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Meta x realizado</h2>
+                    <p>Quanto da meta cada vendedor já entregou.</p>
+                </div>
+            </div>
+ 
+            <div id="comGoals"></div>
+        </section>
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Alertas e insights</h2>
+                    <p>Pontos de atenção calculados a partir do período.</p>
+                </div>
+            </div>
+ 
+            <div class="com-insights" id="comInsights"></div>
+        </section>
+ 
+    </div>
+ 
+    <!-- NEGÓCIOS EM ANDAMENTO -->
+    <section class="panel com-panel">
+        <div class="panel-header">
+            <div>
+                <h2>Negócios em andamento</h2>
+                <p>Oportunidades abertas no pipeline.</p>
+            </div>
+ 
+            <div class="com-tabs" id="comDealTabs">
+                <button type="button" class="active" data-tab="hot">Quentes</button>
+                <button type="button" data-tab="risk">Em risco</button>
+            </div>
+        </div>
+ 
+        <p class="com-total" id="comDealTotal"></p>
+        <ul class="com-list" id="comDealList"></ul>
+    </section>
+ 
+    <!-- DETALHAMENTO -->
+    <section class="panel com-panel">
+        <div class="panel-header">
+            <div>
+                <h2>Detalhamento mensal</h2>
+                <p>Pedidos, vendas e meta de cada vendedor em cada mês.</p>
+            </div>
+        </div>
+ 
+        <div class="com-filters">
+            <div class="com-field">
+                <label for="comSearch">Pesquisar</label>
+                <input type="search" id="comSearch" class="search-input"
+                       placeholder="Buscar vendedor ou mês...">
+            </div>
+ 
+            <div class="com-field">
+                <label for="comStatus">Resultado</label>
+                <select id="comStatus">
+                    <option value="all">Todos</option>
+                    <option value="up">Acima da meta</option>
+                    <option value="down">Abaixo da meta</option>
+                </select>
+            </div>
+ 
+            <button type="button" id="comClear" class="secondary-button">
+                Limpar filtros
+            </button>
+        </div>
+ 
+        <p id="comCount" class="com-count" aria-live="polite"></p>
+ 
+        <div class="com-table-wrap">
+            <table class="data-table" id="comTable">
+                <thead></thead>
+                <tbody></tbody>
+                <tfoot></tfoot>
+            </table>
+        </div>
+    </section>
+ 
+</section>
+
+<!-- PÁGINA: LOGÍSTICA  -->
+<section class="page-section" id="logistics">
+ 
+    <!-- CABEÇALHO + FILTROS -->
+    <div class="section-heading">
+        <div>
+            <h2>Logística</h2>
+            <p>Acompanhe entregas, estoque, atrasos e pedidos em rota.</p>
+        </div>
+ 
+        <div class="log-controls">
+            <label class="filter-control">
+                <span>Período:</span>
+                <select id="logRange">
+                    <option value="3">Últimos 3 meses</option>
+                    <option value="6" selected>Últimos 6 meses</option>
+                </select>
+            </label>
+ 
+            <label class="filter-control">
+                <span>Centro:</span>
+                <select id="logCenter"></select>
+            </label>
+ 
+            <label class="filter-control">
+                <span>Transportadora:</span>
+                <select id="logCarrier"></select>
+            </label>
+ 
+            <button class="secondary-button" id="logExport" type="button">
+                <i class="bx bx-download"></i>
+                Exportar CSV
+            </button>
+        </div>
+    </div>
+ 
+    <!-- LINHA PRINCIPAL: indicadores + gráfico à esquerda, fluxo e mapa à direita -->
+    <div class="log-layout">
+ 
+        <div class="log-main">
+ 
+            <!-- INDICADORES PRINCIPAIS (gerados pelo JS) -->
+            <div class="stats-grid" id="logKpis"></div>
+ 
+            <!-- INDICADORES SECUNDÁRIOS (gerados pelo JS) -->
+            <div class="log-metrics" id="logMetrics"></div>
+ 
+            <!-- ENTREGAS x META -->
+            <section class="panel log-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Entregas x meta</h2>
+                        <p>Entregas realizadas mês a mês comparadas à meta.</p>
+                    </div>
+ 
+                    <span class="chart-badge">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                        Meta mensal
+                    </span>
+                </div>
+ 
+                <div class="log-chart tall">
+                    <canvas id="logDeliveryChart"></canvas>
+                </div>
+            </section>
+ 
+        </div>
+ 
+        <aside class="log-side">
+ 
+            <!-- FLUXO DE PEDIDOS -->
+            <section class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Fluxo de pedidos</h2>
+                        <p>Do recebimento até a entrega.</p>
+                    </div>
+                </div>
+ 
+                <div class="log-flow" id="logFlow"></div>
+                <p class="log-flow-foot" id="logFlowFoot"></p>
+            </section>
+ 
+            <!-- MAPA DO ARMAZÉM -->
+            <section class="panel log-map-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Mapa do armazém</h2>
+                        <p>Ocupação por zona de armazenagem.</p>
+                    </div>
+                </div>
+ 
+                <div class="log-map" id="logMap"></div>
+ 
+                <div class="log-legend">
+                    <span><i class="l1"></i>Até 25%</span>
+                    <span><i class="l2"></i>26–50%</span>
+                    <span><i class="l3"></i>51–75%</span>
+                    <span><i class="l4"></i>Acima de 75%</span>
+                </div>
+ 
+                <p class="log-map-foot" id="logMapFoot"></p>
+            </section>
+ 
+        </aside>
+ 
+    </div>
+ 
+    <!-- ESTOQUE / TRANSPORTADORAS -->
+    <div class="bottom-grid">
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Estoque por categoria</h2>
+                    <p>Volume atual comparado ao estoque mínimo.</p>
+                </div>
+            </div>
+ 
+            <div class="log-chart">
+                <canvas id="logStockChart"></canvas>
+            </div>
+        </section>
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Atrasos por transportadora</h2>
+                    <p>Percentual de entregas fora do prazo.</p>
+                </div>
+            </div>
+ 
+            <div class="log-chart">
+                <canvas id="logCarrierChart"></canvas>
+            </div>
+        </section>
+ 
+    </div>
+ 
+    <!-- META POR CENTRO / INSIGHTS -->
+    <div class="bottom-grid">
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Meta x realizado</h2>
+                    <p>Quanto da meta cada centro de distribuição entregou.</p>
+                </div>
+            </div>
+ 
+            <div id="logGoals"></div>
+        </section>
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Alertas e insights</h2>
+                    <p>Pontos de atenção calculados a partir do período.</p>
+                </div>
+            </div>
+ 
+            <div class="log-insights" id="logInsights"></div>
+        </section>
+ 
+    </div>
+ 
+    <!-- ROTAS EM ANDAMENTO -->
+    <section class="panel log-panel">
+        <div class="panel-header">
+            <div>
+                <h2>Rotas em andamento</h2>
+                <p>Acompanhe a posição de cada carga até o destino.</p>
+            </div>
+ 
+            <div class="log-tabs" id="logRouteTabs">
+                <button type="button" class="active" data-tab="all">Todas</button>
+                <button type="button" data-tab="late">Atrasadas</button>
+            </div>
+        </div>
+ 
+        <p class="log-total" id="logRouteTotal"></p>
+        <div class="log-routes" id="logRoutes"></div>
+    </section>
+ 
+    <!-- DETALHAMENTO -->
+    <section class="panel log-panel">
+        <div class="panel-header">
+            <div>
+                <h2>Detalhamento mensal</h2>
+                <p>Pedidos, entregas, atrasos e meta de cada centro em cada mês.</p>
+            </div>
+        </div>
+ 
+        <div class="log-filters">
+            <div class="log-field">
+                <label for="logSearch">Pesquisar</label>
+                <input type="search" id="logSearch" class="search-input"
+                       placeholder="Buscar centro ou mês...">
+            </div>
+ 
+            <div class="log-field">
+                <label for="logStatus">Resultado</label>
+                <select id="logStatus">
+                    <option value="all">Todos</option>
+                    <option value="up">Acima da meta</option>
+                    <option value="down">Abaixo da meta</option>
+                </select>
+            </div>
+ 
+            <button type="button" id="logClear" class="secondary-button">
+                Limpar filtros
+            </button>
+        </div>
+ 
+        <p id="logCount" class="log-count" aria-live="polite"></p>
+ 
+        <div class="log-table-wrap">
+            <table class="data-table" id="logTable">
+                <thead></thead>
+                <tbody></tbody>
+                <tfoot></tfoot>
+            </table>
+        </div>
+    </section>
+ 
+</section>
+
+
+<!-- PÁGINA: TI -->
+<!-- PÁGINA: TI -->
+<section class="page-section" id="it">
+ 
+    <!-- CABEÇALHO + FILTROS -->
+    <div class="section-heading">
+        <div>
+            <h2>Tecnologia da Informação</h2>
+            <p>War room de incidentes: chamados, plantão, dependências e tempo de resolução.</p>
+        </div>
+ 
+        <div class="ti-controls">
+            <label class="filter-control">
+                <span>Período:</span>
+                <select id="tiRange">
+                    <option value="24" selected>Últimas 24 h</option>
+                    <option value="168">Últimos 7 dias</option>
+                    <option value="720">Últimos 30 dias</option>
+                </select>
+            </label>
+ 
+            <label class="filter-control">
+                <span>Serviço:</span>
+                <select id="tiService"></select>
+            </label>
+ 
+            <label class="filter-control">
+                <span>Severidade:</span>
+                <select id="tiSeverity">
+                    <option value="all">Todas</option>
+                    <option value="1">SEV-1</option>
+                    <option value="2">SEV-2</option>
+                    <option value="3">SEV-3</option>
+                </select>
+            </label>
+ 
+            <label class="filter-control">
+                <span>Equipe:</span>
+                <select id="tiTeam"></select>
+            </label>
+ 
+            <button class="secondary-button" id="tiExport" type="button">
+                <i class="bx bx-download"></i>
+                Exportar CSV
+            </button>
+        </div>
+    </div>
+ 
+    <!-- INDICADORES PRINCIPAIS (gerados pelo JS) -->
+    <div class="stats-grid" id="tiKpis"></div>
+ 
+    <!-- INDICADORES SECUNDÁRIOS (gerados pelo JS) -->
+    <div class="ti-metrics" id="tiMetrics"></div>
+ 
+    <!-- QUEM ESTÁ DE PLANTÃO -->
+    <section class="panel ti-panel">
+        <div class="panel-header">
+            <div>
+                <h2>Quem está de plantão</h2>
+                <p>Rotação atual e cadeia de escalonamento.</p>
+            </div>
+ 
+            <span class="chart-badge live">
+                <i class="bx bx-broadcast"></i>
+                Rotação ao vivo
+            </span>
+        </div>
+ 
+        <div class="ti-oncall" id="tiOnCall"></div>
+    </section>
+ 
+    <!-- COPILOTO DE CAUSA RAIZ -->
+    <div class="ti-copilot" id="tiCopilot"></div>
+ 
+    <!-- QUADRO | MAPA | LINHA DO TEMPO -->
+    <div class="ti-layout">
+ 
+        <section class="panel ti-board-panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Quadro de incidentes</h2>
+                    <p id="tiBoardCount">0 abertos</p>
+                </div>
+            </div>
+ 
+            <div class="ti-board" id="tiBoard"></div>
+        </section>
+ 
+        <section class="panel ti-map-panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Mapa de dependências</h2>
+                    <p>Veja o raio de impacto de cada serviço.</p>
+                </div>
+            </div>
+ 
+            <div class="ti-map" id="tiMap">
+                <div class="ti-map-hint">Passe o mouse num nó para ver o raio de impacto · clique para filtrar</div>
+                <svg class="ti-edges" id="tiEdges" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+            </div>
+ 
+            <p class="ti-map-foot" id="tiMapFoot"></p>
+        </section>
+ 
+        <section class="panel ti-timeline-panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Linha do tempo</h2>
+                    <p>Eventos do incidente selecionado.</p>
+                </div>
+ 
+                <span class="chart-badge live" id="tiTimelineTag">Ao vivo</span>
+            </div>
+ 
+            <div class="ti-timeline" id="tiTimeline"></div>
+        </section>
+ 
+    </div>
+ 
+    <!-- GRÁFICOS: VOLUME / MTTR POR SERVIÇO -->
+    <div class="bottom-grid">
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Incidentes ao longo do tempo</h2>
+                    <p>Volume por severidade no período.</p>
+                </div>
+            </div>
+ 
+            <div class="ti-chart"><canvas id="tiTimeChart"></canvas></div>
+        </section>
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Tempo de resolução por serviço</h2>
+                    <p>MTTR médio (min) dos incidentes resolvidos.</p>
+                </div>
+            </div>
+ 
+            <div class="ti-chart"><canvas id="tiServiceChart"></canvas></div>
+        </section>
+ 
+    </div>
+ 
+    <!-- GRÁFICOS: CAUSA RAIZ / TENDÊNCIA -->
+    <div class="bottom-grid">
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Causas raiz</h2>
+                    <p>O que mais gera incidentes no período.</p>
+                </div>
+            </div>
+ 
+            <div class="ti-chart"><canvas id="tiCauseChart"></canvas></div>
+        </section>
+ 
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Tendência de MTTA e MTTR</h2>
+                    <p>Tempo de reconhecimento e de resolução (min).</p>
+                </div>
+            </div>
+ 
+            <div class="ti-chart"><canvas id="tiTrendChart"></canvas></div>
+        </section>
+ 
+    </div>
+ 
+    <!-- DETALHAMENTO -->
+    <section class="panel ti-panel">
+        <div class="panel-header">
+            <div>
+                <h2>Detalhamento de incidentes</h2>
+                <p>Histórico completo com responsável, MTTA e MTTR.</p>
+            </div>
+        </div>
+ 
+        <div class="ti-filters">
+            <div class="ti-field">
+                <label for="tiSearch">Pesquisar</label>
+                <input type="search" id="tiSearch" class="search-input"
+                       placeholder="Buscar ID, serviço ou responsável...">
+            </div>
+ 
+            <div class="ti-field">
+                <label for="tiStatus">Status</label>
+                <select id="tiStatus">
+                    <option value="all">Todos</option>
+                    <option value="triggered">Acionado</option>
+                    <option value="ack">Reconhecido</option>
+                    <option value="mitigated">Mitigado</option>
+                    <option value="resolved">Resolvido</option>
+                </select>
+            </div>
+ 
+            <button type="button" id="tiClear" class="secondary-button">
+                Limpar filtros
+            </button>
+        </div>
+ 
+        <p id="tiCount" class="ti-count" aria-live="polite"></p>
+ 
+        <div class="ti-table-wrap">
+            <table class="data-table" id="tiTable">
+                <thead></thead>
+                <tbody></tbody>
+                <tfoot></tfoot>
+            </table>
+        </div>
+    </section>
+ 
+</section>
+
+<!-- PÁGINA: DADOS -->
+<section class="page-section" id="data">
+
+    <div class="panel">
+
+        <!-- CABEÇALHO -->
+        <div class="panel-header">
+            <div>
+                <h2>Central de Dados</h2>
+                <p>Importe, organize e consulte os dados da sua plataforma.</p>
+            </div>
+        </div>
+
+        <!-- ÁREA DE IMPORTAÇÃO -->
+        <div class="import-section">
+
+            <div class="import-heading">
+                <div class="import-heading-icon">
+                    <i class="bx bx-cloud-upload"></i>
+                </div>
+
+                <div>
+                    <h3>Importar dados</h3>
+                    <p>Envie arquivos e organize os dados por departamento.</p>
+                </div>
+            </div>
+
+            <form id="importForm" class="import-form">
+
+                <div class="import-field">
+                    <label for="importSector">Departamento de destino</label>
+
+                    <select id="importSector" name="sector" required>
+                        <option value="">Selecione um setor</option>
+                        <option value="finance">Financeiro</option>
+                        <option value="commercial">Comercial</option>
+                        <option value="logistics">Logística</option>
+                        <option value="it">TI</option>
+                    </select>
+
+                    <small>Escolha o departamento que receberá os dados.</small>
+                </div>
+
+          <div class="import-field">
+    <label for="importFile">Arquivo de dados</label>
+
+    <input
+        type="file"
+        id="importFile"
+        name="file"
+        accept=".csv,text/csv"
+        required
+    >
+
+    <small>Formato aceito: CSV. Selecione um arquivo do seu computador.</small>
+
+    <p id="selectedFileName" class="selected-file-name">
+        Nenhum arquivo selecionado
+    </p>
+</div>
+
+                <div class="import-actions">
+                    <button class="primary-button" type="submit">
+                        <i class="bx bx-upload"></i>
+                        Preparar importação
+                    </button>
+
+                    <p id="importMessage" role="status" aria-live="polite"></p>
+                </div>
+
+            </form>
+
+        </div>
+
+<!-- PESQUISA E FILTROS AVANÇADOS -->
+<div class="data-search-section">
+
+    <h3>Registros disponíveis</h3>
+    <p>Pesquise e filtre os registros da Central de Dados.</p>
+
+    <div class="data-filters">
+
+        <div class="filter-field">
+            <label for="searchData">Pesquisar</label>
+
+            <input
+                type="search"
+                id="searchData"
+                class="search-input"
+                placeholder="Pesquisar registros..."
+            >
+        </div>
+
+        <div class="filter-field">
+            <label for="filterCategoria">Categoria</label>
+
+            <select id="filterCategoria">
+                <option value="">Todas as categorias</option>
+            </select>
+        </div>
+
+        <div class="filter-field">
+            <label for="filterStatus">Status</label>
+
+            <select id="filterStatus">
+                <option value="">Todos os status</option>
+                <option value="concluido">Concluído</option>
+                <option value="pendente">Pendente</option>
+                <option value="andamento">Em andamento</option>
+                <option value="erro">Com erro</option>
+            </select>
+        </div>
+
+        <div class="filter-field">
+            <label for="filterSetor">Departamento</label>
+
+            <select id="filterSetor">
+                <option value="">Todos os departamentos</option>
+                <option value="finance">Financeiro</option>
+                <option value="commercial">Comercial</option>
+                <option value="logistics">Logística</option>
+                <option value="it">TI</option>
+            </select>
+        </div>
+
+        <button
+            type="button"
+            id="clearFilters"
+            class="secondary-button"
+        >
+            Limpar filtros
+        </button>
+
+    </div>
+
+    <p id="filterResultCount" aria-live="polite"></p>
+
+</div>
+        <!-- TABELA -->
+        <div class="table-wrapper">
+
+            <table class="data-table">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Registro</th>
+                        <th>Categoria</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+<tbody id="dataTableBody">
+
+</tbody>
+            </table>
+
+            <p id="dataTableState" class="table-state" role="status" aria-live="polite">Carregando registros...</p>
+
+    </div>
+    <!-- FIM DA TABELA -->
+
+</div>
+<!-- FIM DO PANEL -->
+
+</section>
+<!-- FIM DA PÁGINA: DADOS -->
+<!-- PÁGINA: RELATÓRIOS -->
+<section class="page-section" id="reports">
+
+    <div class="section-heading">
+        <div>
+            <h2>Relatórios</h2>
+            <p>Consulte e exporte relatórios dos departamentos do DataOps.</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+
+        <article class="stat-card">
+            <div class="stat-top">
+                <span>Relatórios disponíveis</span>
+                <span class="stat-icon blue">
+                    <i class="bx bx-file"></i>
+                </span>
+            </div>
+            <h3>6</h3>
+            <p class="stat-description">Relatórios demonstrativos</p>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-top">
+                <span>Departamentos</span>
+                <span class="stat-icon green">
+                    <i class="bx bx-buildings"></i>
+                </span>
+            </div>
+            <h3>4</h3>
+            <p class="stat-description">Áreas monitoradas</p>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-top">
+                <span>Formato disponível</span>
+                <span class="stat-icon purple">
+                    <i class="bx bx-download"></i>
+                </span>
+            </div>
+            <h3>CSV</h3>
+            <p class="stat-description">Exportação de dados</p>
+        </article>
+
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Central de relatórios</h2>
+                <p>Selecione o departamento e o formato para preparar um relatório.</p>
+            </div>
+        </div>
+
+        <div class="data-filters">
+
+            <div class="filter-field">
+                <label for="reportDepartment">Departamento</label>
+                <select id="reportDepartment">
+                    <option value="all">Todos</option>
+                    <option value="finance">Financeiro</option>
+                    <option value="commercial">Comercial</option>
+                    <option value="logistics">Logística</option>
+                    <option value="it">TI</option>
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label for="reportFormat">Formato</label>
+                <select id="reportFormat">
+                    <option value="csv">CSV</option>
+                </select>
+            </div>
+
+            <button type="button" class="primary-button" id="generateReport">
+                <i class="bx bx-download"></i>
+                Exportar relatório
+            </button>
+
+        </div>
+
+        <p id="reportMessage" role="status" aria-live="polite"></p>
+    </div>
+
+</section>
+
+
+<!-- PÁGINA: CONFIGURAÇÕES -->
+<section class="page-section" id="settings">
+
+    <div class="section-heading">
+        <div>
+            <h2>Configurações</h2>
+            <p>Personalize o perfil, a aparência e o comportamento do DataOps.</p>
+        </div>
+    </div>
+
+    <p id="settingsMessage" role="status" aria-live="polite"></p>
+
+    <div class="settings-grid">
+
+        <!-- ===== PERFIL ===== -->
+        <section class="panel" id="profilePanel">
+            <div class="panel-header">
+                <div>
+                    <h2><i class="bx bx-user"></i> Perfil do usuário</h2>
+                    <p>Dados exibidos no menu lateral.</p>
+                </div>
+                <span class="settings-badge">Demonstrativo</span>
+            </div>
+
+            <div class="profile-summary">
+                <div class="profile-avatar" id="profileAvatar">U</div>
+                <div class="profile-summary-text">
+                    <strong id="profileDisplayName">Usuário</strong>
+                    <span id="profileDisplayRole">Cargo não informado</span>
+                </div>
+            </div>
+
+            <form id="profileForm" class="profile-form" novalidate>
+                <div class="settings-group">
+                    <label for="profileName">Nome completo</label>
+                    <input type="text" id="profileName" maxlength="60"
+                           autocomplete="name" placeholder="Seu nome" disabled>
+                </div>
+
+                <div class="settings-group">
+                    <label for="profileEmail">E-mail</label>
+                    <input type="email" id="profileEmail" maxlength="80"
+                           autocomplete="email" placeholder="voce@empresa.com" disabled>
+                </div>
+
+                <div class="settings-group">
+                    <label for="profileRole">Cargo</label>
+                    <input type="text" id="profileRole" maxlength="40"
+                           placeholder="Ex.: Analista de dados" disabled>
+                </div>
+
+                <div class="settings-group">
+                    <label for="profileDept">Departamento</label>
+                    <select id="profileDept" disabled>
+                        <option value="">Não informado</option>
+                        <option value="finance">Financeiro</option>
+                        <option value="commercial">Comercial</option>
+                        <option value="logistics">Logística</option>
+                        <option value="it">TI</option>
+                        <option value="other">Outro</option>
+                    </select>
+                </div>
+
+                <div class="settings-actions is-start profile-actions">
+                    <button type="button" class="secondary-button" id="profileEdit">
+                        <i class="bx bx-edit"></i> Editar perfil
+                    </button>
+                    <button type="submit" class="primary-button" id="profileSave" hidden>
+                        <i class="bx bx-save"></i> Salvar perfil
+                    </button>
+                    <button type="button" class="secondary-button" id="profileCancel" hidden>
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+
+            <p class="settings-note">
+                O DataOps ainda não tem autenticação. Estes dados ficam só neste
+                navegador e o cargo é apenas informativo: ele não concede permissões.
+            </p>
+        </section>
+
+
+        <!-- ===== APARÊNCIA ===== -->
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2><i class="bx bx-palette"></i> Aparência</h2>
+                    <p>Escolha como deseja visualizar o painel.</p>
+                </div>
+            </div>
+
+            <fieldset class="theme-picker" id="themePicker">
+                <legend>Tema</legend>
+
+                <div class="theme-options">
+                    <label class="theme-card">
+                        <input type="radio" name="theme" value="light">
+                        <i class="bx bx-sun"></i>
+                        <span>Claro</span>
+                    </label>
+
+                    <label class="theme-card">
+                        <input type="radio" name="theme" value="dark">
+                        <i class="bx bx-moon"></i>
+                        <span>Escuro</span>
+                    </label>
+
+                    <label class="theme-card">
+                        <input type="radio" name="theme" value="auto">
+                        <i class="bx bx-desktop"></i>
+                        <span>Automático</span>
+                    </label>
+                </div>
+
+                <small class="settings-hint">
+                    Automático segue a preferência do seu sistema operacional.
+                </small>
+            </fieldset>
+
+            <div class="settings-group">
+                <label for="languageSetting">Idioma</label>
+                <select id="languageSetting" disabled>
+                    <option value="pt-BR">Português (Brasil)</option>
+                </select>
+                <small>A troca de idioma ainda não está disponível.</small>
+            </div>
+        </section>
+
+
+        <!-- ===== NOTIFICAÇÕES ===== -->
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2><i class="bx bx-bell"></i> Notificações</h2>
+                    <p>Escolha o que aparece na central de notificações.</p>
+                </div>
+            </div>
+
+            <div class="settings-option">
+                <div class="option-text">
+                    <span class="option-icon"><i class="bx bx-file"></i></span>
+                    <div>
+                        <label for="notifReports">Novos relatórios</label>
+                        <small>Avisa na tela quando um relatório é exportado.</small>
+                    </div>
+                </div>
+                <input type="checkbox" id="notifReports" data-notif="reports">
+            </div>
+
+            <div class="settings-option">
+                <div class="option-text">
+                    <span class="option-icon"><i class="bx bx-error"></i></span>
+                    <div>
+                        <label for="notifAlerts">Alertas do sistema</label>
+                        <small>Exibe os alertas inteligentes da Visão geral.</small>
+                    </div>
+                </div>
+                <input type="checkbox" id="notifAlerts" data-notif="alerts">
+            </div>
+
+            <div class="settings-option">
+                <div class="option-text">
+                    <span class="option-icon"><i class="bx bx-data"></i></span>
+                    <div>
+                        <label for="notifData">Atualizações de dados</label>
+                        <small>Avisa quando os registros da Central de Dados mudam.</small>
+                    </div>
+                </div>
+                <input type="checkbox" id="notifData" data-notif="data">
+            </div>
+
+            <div class="settings-option">
+                <div class="option-text">
+                    <span class="option-icon"><i class="bx bx-envelope"></i></span>
+                    <div>
+                        <label for="notifEmail">Notificações por e-mail</label>
+                        <small>O envio de e-mails ainda não está integrado. A preferência é salva só neste navegador.</small>
+                    </div>
+                </div>
+                <input type="checkbox" id="notifEmail" data-notif="email">
+            </div>
+        </section>
+
+
+        <!-- ===== SISTEMA ===== -->
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2><i class="bx bx-slider-alt"></i> Configurações do sistema</h2>
+                    <p>Comportamento do painel neste navegador.</p>
+                </div>
+            </div>
+
+            <div class="settings-option">
+                <div class="option-text">
+                    <span class="option-icon"><i class="bx bx-refresh"></i></span>
+                    <div>
+                        <label for="autoRefresh">Atualização automática</label>
+                        <small>A cada 60 s, recalcula indicadores e gráficos com os registros salvos. Não há servidor conectado.</small>
+                    </div>
+                </div>
+                <input type="checkbox" id="autoRefresh">
+            </div>
+
+            <div class="settings-option">
+                <div class="option-text">
+                    <span class="option-icon"><i class="bx bx-run"></i></span>
+                    <div>
+                        <label for="reduceMotion">Reduzir animações</label>
+                        <small>Desativa transições e animações da interface e dos gráficos.</small>
+                    </div>
+                </div>
+                <input type="checkbox" id="reduceMotion">
+            </div>
+
+            <div class="settings-group">
+                <label for="defaultPeriod">Período padrão dos gráficos</label>
+                <select id="defaultPeriod">
+                    <option value="week">Últimos 7 dias</option>
+                    <option value="month">Últimos 30 dias</option>
+                    <option value="year">Últimos 12 meses</option>
+                </select>
+            </div>
+
+            <div class="settings-group">
+                <label for="defaultFormat">Formato padrão de exportação</label>
+                <select id="defaultFormat">
+                    <option value="csv">CSV</option>
+                    <option value="xlsx" disabled>Excel (em breve)</option>
+                </select>
+            </div>
+
+            <div class="settings-actions is-start">
+                <button type="button" class="secondary-button" id="restoreSettings">
+                    <i class="bx bx-reset"></i> Restaurar preferências
+                </button>
+            </div>
+
+            <p class="settings-note">
+                Restaura só as preferências desta tela. Perfil e registros da
+                Central de Dados não são afetados.
+            </p>
+        </section>
+
+
+        <!-- ===== USUÁRIOS ===== -->
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2><i class="bx bx-group"></i> Gerenciamento de usuários</h2>
+                    <p>Cargos e permissões de acesso.</p>
+                </div>
+                <span class="settings-badge">Em breve</span>
+            </div>
+
+            <ul class="role-list">
+                <li><strong>Colaborador</strong><span>Consulta de dados.</span></li>
+                <li><strong>Analista</strong><span>Consulta e importação.</span></li>
+                <li><strong>Líder</strong><span>Planejado: editar, atualizar e excluir registros.</span></li>
+                <li><strong>Administrador</strong><span>Planejado: gerenciar usuários e permissões.</span></li>
+            </ul>
+
+            <div class="settings-actions is-start">
+                <button type="button" class="secondary-button" disabled>
+                    <i class="bx bx-lock-alt"></i> Gerenciar usuários (indisponível)
+                </button>
+            </div>
+
+            <p class="settings-note">
+                Permissões reais exigem login e validação no servidor. Esconder
+                botões na interface não protege os dados, por isso esta área só
+                será liberada quando existir um backend.
+            </p>
+        </section>
+
+
+        <!-- ===== SOBRE ===== -->
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2><i class="bx bx-info-circle"></i> Sobre o DataOps</h2>
+                    <p>Informações da plataforma.</p>
+                </div>
+            </div>
+
+            <p><strong>DataOps</strong> — Painel demonstrativo</p>
+            <p class="settings-note">
+                Plataforma de análise e gestão de dados corporativos, com visão
+                por departamento, importação de CSV e relatórios.
+            </p>
+
+            <div class="settings-actions is-start">
+                <button type="button" class="secondary-button" id="systemInfoToggle"
+                        aria-expanded="false" aria-controls="systemInfo">
+                    <i class="bx bx-cog"></i> Ver informações do sistema
+                </button>
+            </div>
+
+            <dl class="system-info" id="systemInfo" hidden></dl>
+        </section>
+
+    </div>
+
+</section>
+</main>
+<!-- FIM DO CONTEÚDO PRINCIPAL -->
+
+</div>
+<!-- FIM DO DASHBOARD -->
+
+</body>
+</html>

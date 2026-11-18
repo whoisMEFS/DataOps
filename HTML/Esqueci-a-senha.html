@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/style.css">
+
+    <title>Esqueci a senha | DataOps</title>
+</head>
+<body>
+
+    <main class="container">
+        <form id="resetForm">
+            <h1>Esqueci a senha</h1>
+
+            <p class="descricao">
+                Digite seu e-mail para receber as instruções
+                de recuperação da sua senha.
+            </p>
+
+            <div class="input-box">
+                <input type="email" placeholder="Seu e-mail" id="resetEmail" autocomplete="email" required>
+                <i class="bx bx-envelope"></i>
+            </div>
+
+            <p class="form-message" id="resetMessage" role="alert" aria-live="polite" hidden></p>
+
+            <button type="submit" class="login">
+                Esqueci a senha
+            </button>
+
+            <div class="register-link">
+                <p>
+                    Lembrou sua senha?
+                    <a href="Login.html">Voltar ao login</a>
+                </p>
+            </div>
+        </form>
+    </main>
+
+    <script type="module" src="../JS/pages/reset-request.js"></script>
+</body>
+</html>

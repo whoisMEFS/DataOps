@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/style.css">
+
+    <title>DataOps | Ativar acesso</title>
+</head>
+<body>
+
+    <main class="container">
+        <form id="inviteForm">
+            <h1 id="inviteTitle">Ativar acesso</h1>
+            <div class="input-box" id="inviteNameBox">
+                <input placeholder="Nome completo" id="inviteName" autocomplete="name" maxlength="60" required>
+                <i class='bx bx-user'></i>
+            </div>
+            <div class="input-box">
+                <input placeholder="email" type="email" id="inviteEmail" autocomplete="username" readonly required>
+                <i class='bx bx-envelope'></i>
+            </div>
+              <div class="input-box">
+                <input type="password" placeholder="Criar senha" id="invitePassword" autocomplete="new-password" minlength="8" required>
+                <i class="bx bx-lock-alt"></i>
+            </div>
+           <div class="input-box">
+                <input type="password" placeholder="Confirmar senha" id="invitePasswordConfirm" autocomplete="new-password" minlength="8" required>
+                <i class="bx bx-lock-alt"></i>
+            </div>
+
+         <p class="form-message" id="inviteMessage" role="alert" aria-live="polite" hidden></p>
+
+         <button type="submit" class="login">Ativar acesso</button>
+
+            <div class="register-link">
+                <p>Já tem uma conta?
+                    <a href="Login.html">Fazer login</a>
+                </p>
+            </div>
+        </form>
+    </main>
+
+    <script type="module" src="../JS/pages/set-password.js"></script>
+</body>
+</html>

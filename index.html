@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataOps</title>
+    <script>
+        /* Porta de entrada do site (URL raiz).
+           - Links de convite/recuperação do Supabase chegam aqui com o token
+             no "#": repassa para a página que define a senha.
+           - Qualquer outro acesso vai para o login. */
+        (function () {
+            var hash = window.location.hash || "";
+            var p = new URLSearchParams(hash.replace(/^#/, ""));
+            var tipo = p.get("type");
+            var destino = "HTML/Login.html";
+
+            if (tipo === "invite" || tipo === "recovery" || p.get("error")) {
+                destino = "HTML/cadastro.html";
+            }
+
+            window.location.replace(destino + hash);
+        })();
+    </script>
+</head>
+<body>
+    <noscript><a href="HTML/Login.html">Entrar no DataOps</a></noscript>
+</body>
+</html>
